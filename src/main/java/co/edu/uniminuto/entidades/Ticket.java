@@ -1,4 +1,3 @@
-
 package co.edu.uniminuto.entidades;
 
 import co.edu.uniminuto.dao.TicketDao;
@@ -7,8 +6,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
+// Clase Ticket que representa un ticket de estacionamiento
 public class Ticket {
     
+    // Atributos del ticket
     private LocalDateTime entradaDeVehiculo;
     private LocalDateTime salidaDeVehiculo;
     private Usuario usuario;
@@ -16,7 +17,7 @@ public class Ticket {
     private double pago;
     private int numeroDeParqueadero;
    
-
+    // Constructor con todos los atributos
     public Ticket(LocalDateTime entradaDeVehiculo, LocalDateTime salidaDeVehiculo, Usuario usuario, Vehiculo vehiculo, double pago, int numeroDeParqueadero) {
         this.entradaDeVehiculo = entradaDeVehiculo;
         this.salidaDeVehiculo = salidaDeVehiculo;
@@ -26,13 +27,16 @@ public class Ticket {
         this.numeroDeParqueadero = numeroDeParqueadero;
     }
 
+    // Constructor vacío
     public Ticket() {
     }
 
+    // Constructor con salidaDeVehiculo como parámetro
     public Ticket(LocalDateTime salidaDeVehiculo) {
         this.salidaDeVehiculo = salidaDeVehiculo;
     }
        
+    // Getters y setters para todos los atributos del ticket
     public LocalDateTime getEntradaDeVehiculo() {
         return entradaDeVehiculo;
     }
@@ -77,19 +81,22 @@ public class Ticket {
         return numeroDeParqueadero;
     }
 
-    public void setNumeroDeParqueadero(int numeroDeParquedero) {
-        this.numeroDeParqueadero = numeroDeParquedero;
+    public void setNumeroDeParqueadero(int numeroDeParqueadero) {
+        this.numeroDeParqueadero = numeroDeParqueadero;
     }        
        
+    // Método para guardar la salida del vehículo con fecha y hora específicas
     public LocalDateTime guardarSalida(int año, int mes, int dias, int hora){
         this.entradaDeVehiculo = LocalDateTime.of(año, mes, dias, hora,0);
         return this.entradaDeVehiculo; 
     }
     
-    public int calcularMinutos(LocalDateTime entradaDevehiculo, LocalDateTime salidaDevehiculo){        
-        return (int) (Duration.between(entradaDevehiculo, salidaDevehiculo).toMinutes());
+    // Método para calcular los minutos entre dos fechas y horas específicas
+    public int calcularMinutos(LocalDateTime entradaDeVehiculo, LocalDateTime salidaDeVehiculo){        
+        return (int) (Duration.between(entradaDeVehiculo, salidaDeVehiculo).toMinutes());
     }
     
+    // Método para generar una variable de tiempo basada en la fecha y hora de entrada
     public LocalDateTime generarVariableDeTiempo(LocalDateTime entradaDeVehiculo){
         int dias = Integer.parseInt(JOptionPane.showInputDialog("Cuantos días: "));
         int horas;
@@ -108,7 +115,7 @@ public class Ticket {
         }
         return entradaDeVehiculo.plusDays(dias).withHour(horas).withMinute(minutos).withSecond(entradaDeVehiculo.getSecond());
     }
-    
+ 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -122,6 +129,4 @@ public class Ticket {
         sb.append('}');
         return sb.toString();
     }
-    
-    
 }
