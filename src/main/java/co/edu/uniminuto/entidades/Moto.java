@@ -6,7 +6,7 @@ public class Moto extends Vehiculo {
     private String placa;
     
     // Atributo precio con un valor por defecto de 100
-    private int precio = 100;
+    private int precio = 114;
 
     // Constructor que inicializa los atributos tipo, marca, modelo y placa
     public Moto(String tipo, String marca, String modelo, String placa) {

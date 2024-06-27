@@ -19,7 +19,8 @@ public class Parqueadero{
     public static void main(String[] args) {
         
         //variable que ayuda a controlar las diferentes opciones:
-        Short opcion = null;
+        short opcion = -1;
+
 
         //Las variables usadas para la generacion del objeto usuario
         int idUsuario;
@@ -58,24 +59,23 @@ public class Parqueadero{
         ticketDao = new TicketDao();
         
         //variable de fecha actual
-        LocalDateTime fechaTranscurrida;    
+        LocalDateTime fechaActual;    
         //actualizar datos:
         String datoPorActualizar;
         String actualizacion = ""; 
         String columnaSeleccionada = "";
         do {
             try{
+                fechaActual = LocalDateTime.now().withNano(0); //fecha actual
+                ticketDao.actualizarStatusAutomaticamente(fechaActual); //actualizacion automatica de status
                 do {//inicio de opciones
-                    opcion = Short.parseShort(JOptionPane.showInputDialog("(C)1.Crear un nuevo ticket\n(R)2.Consultar tickets\n(U)3.Actualizar ticket\n(D)3.Borrar ticket (logicamente)\n(-)0.Salir\nElija su opción: ")); 
+                    opcion = Short.parseShort(JOptionPane.showInputDialog("(C)1.Crear un nuevo ticket\n(R)2.Consultar tickets\n(U)3.Actualizar ticket\n(D)4.Borrar ticket (logicamente)\n(--)0.Salir\nElija su opción: ")); 
                     if (opcion > 5 || opcion < 0) {//información sobre las opciones
                         JOptionPane.showMessageDialog(null, "Lo sentimos pero esa opción no es válida", "Aviso", JOptionPane.WARNING_MESSAGE); 
                     }
                 } while (opcion > 5 || opcion < 0);//rango de opciones permito
                 //las diferentes opciones:
-                fechaTranscurrida = LocalDateTime.now().withNano(0); //fecha actual
-                //ticketDao.actualizarStatusAutomaticamente(fechaTranscurrida); //actualizacion automatica de status
-
-                
+               
                 switch (opcion) {
                     case 1:
                         //validacion de datos para la creacion de la clse usuario
@@ -97,12 +97,12 @@ public class Parqueadero{
                             modelo = JOptionPane.showInputDialog("Ingrese el modelo del vehiculo:");
                             //confirmacion de parqueadero, esta necesita dos parametros; el tipo y el número del parqueadero
                             do {
-                                parqueadero = Integer.parseInt(JOptionPane.showInputDialog("Número del parqueadero:"));                                       
-                            } while (ticketDao.consultarParqueadero(parqueadero, tipoVehiculo));/*se consulta en la base de datos si hay algun ticket con status activo(1) y si, si hay alguno,
+                                parqueadero = Integer.parseInt(JOptionPane.showInputDialog("Número del parqueadero (1-10):"));                                       
+                            } while (ticketDao.consultarParqueadero(parqueadero, tipoVehiculo) || parqueadero < 0 || parqueadero > 10);/*se consulta en la base de datos si hay algun ticket con status activo(1) y si, si hay alguno,
                             regresa true, lo cual se repetira hasta que ingrese un numero donde no este activo(1)*/
 
                             //metodo de generacion de salida dada por el usuario
-                            fechaGeneradaUsuario = ticket.generarVariableDeTiempo(fechaTranscurrida);
+                            fechaGeneradaUsuario = ticket.generarVariableDeTiempo(fechaActual);
                             entradaDeVehiculo = LocalDateTime.now().withNano(0);//entrada del vehiculo
                             //verificacion de tipo de vehiculo
                             switch (tipoVehiculo) {
@@ -132,44 +132,60 @@ public class Parqueadero{
                             ticketNum = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el id del ticket:"));
                             ticketDao.consultarTicket(ticketNum);
                             break;
+                           
                         case 3:     
                             ticketNum = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el id del ticket:"));
-                            do{                    
-                                datoPorActualizar = JOptionPane.showInputDialog("Ingrese el dato que va actulizar en el ticket (usuario o vehiculo):");
-                            }while(!datoPorActualizar.equals("usuario") && !datoPorActualizar.equals("vehiculo"));
                             
-                            switch (datoPorActualizar) {
-                                case "usuario":
-                                    do{                                       
-                                        columnaSeleccionada = JOptionPane.showInputDialog("Ingrese el dato que va actulizar referente al usuario (nombre, apellido o id) :");
-                                    }while(!columnaSeleccionada.equals("nombre") && !columnaSeleccionada.equals("apellido") && !columnaSeleccionada.equals("id"));
-                                    actualizacion = JOptionPane.showInputDialog("Ingrese la actualización:");
-                                    columnaSeleccionada = "tick_" + datoPorActualizar +"_" + columnaSeleccionada;
-                                    ticketDao.actualizarDato(columnaSeleccionada, actualizacion, ticketNum);
-                                    break;
-                                case "vehiculo":
-                                    do{
-                                        columnaSeleccionada = JOptionPane.showInputDialog("Ingrese el dato que va actulizar referente al vehiculo (marca, modelo o fecha de salida):");
-                                    }while(!columnaSeleccionada.equals("marca") && !columnaSeleccionada.equals("modelo") && !columnaSeleccionada.equals("fecha de salida"));
-                                    if("fecha de salida".equals(columnaSeleccionada)){
-                                        fechaGeneradaUsuario = ticket.generarVariableDeTiempo(fechaTranscurrida);
-                                        idUsuario = Integer.parseInt(JOptionPane.showInputDialog("Documento del cliente:"));
-                                        nombre = JOptionPane.showInputDialog("Nombre del cliente:");
-                                        ticketDao.actualizarFechaSalida(fechaGeneradaUsuario, nombre, idUsuario, ticketNum);
-                                    }else{
-                                        actualizacion = JOptionPane.showInputDialog("Ingrese la actualización:");
-                                        columnaSeleccionada = "tick_" + datoPorActualizar +"_" + columnaSeleccionada;
-                                        ticketDao.actualizarDato(columnaSeleccionada, actualizacion, ticketNum);
-                                    }
-                                    break;                                                                 
-                            }                                                
+                            do{
+                                do{                    
+                                datoPorActualizar = JOptionPane.showInputDialog("Ingrese el dato que va actulizar en el ticket (usuario o vehiculo):");
+                                }while(!datoPorActualizar.equals("usuario") && !datoPorActualizar.equals("vehiculo"));
+
+                                switch (datoPorActualizar) {
+                                    case "usuario":
+                                        do{                                       
+                                            columnaSeleccionada = JOptionPane.showInputDialog("Ingrese el dato que va actulizar referente al usuario (nombre, apellido o id) :");
+                                        }while(!columnaSeleccionada.equals("nombre") && !columnaSeleccionada.equals("apellido") && !columnaSeleccionada.equals("id"));
+                                        
+                                        if("id".equals(columnaSeleccionada)){
+                                            columnaSeleccionada = "tick_" + datoPorActualizar +"_" + columnaSeleccionada;
+                                            idUsuario = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la actualización:"));
+                                            ticketDao.actualizarDatoId(columnaSeleccionada, idUsuario, ticketNum);
+                                        }else{
+                                            columnaSeleccionada = "tick_" + datoPorActualizar +"_" + columnaSeleccionada;
+                                            actualizacion = JOptionPane.showInputDialog("Ingrese la actualización:");  
+                                            ticketDao.actualizarDato(columnaSeleccionada, actualizacion, ticketNum);
+                                        }                                                 
+                                        break;
+                                    case "vehiculo":
+                                        do{
+                                            columnaSeleccionada = JOptionPane.showInputDialog("Ingrese el dato que va actulizar referente al vehiculo (marca, modelo o fecha de salida):");
+                                        }while(!columnaSeleccionada.equals("marca") && !columnaSeleccionada.equals("modelo") && !columnaSeleccionada.equals("fecha de salida"));
+                                        if("fecha de salida".equals(columnaSeleccionada)){
+                                            fechaGeneradaUsuario = ticket.generarVariableDeTiempo(fechaActual);
+                                            idUsuario = Integer.parseInt(JOptionPane.showInputDialog("Documento del cliente:"));
+                                            nombre = JOptionPane.showInputDialog("Nombre del cliente:");
+                                            ticketDao.actualizarFechaSalida(fechaGeneradaUsuario, nombre, idUsuario, ticketNum);
+                                            
+                                        }else{
+                                            actualizacion = JOptionPane.showInputDialog("Ingrese la actualización:");
+                                            columnaSeleccionada = "tick_" + datoPorActualizar +"_" + columnaSeleccionada;
+                                            ticketDao.actualizarDato(columnaSeleccionada, actualizacion, ticketNum);
+                                        }
+                                        break;
+                                } 
+                                do{
+                                   opcion = Short.parseShort(JOptionPane.showInputDialog("¿quiere editar algún valor más de este ticket? 1.Si 2.No")); 
+                                }while(opcion < 1 || opcion > 2);              
+                            }while(opcion != 2);
+                                                               
                             break;                                                        
                         case 4://borrar ticket (logicamente satus: 0)
                             nombre = JOptionPane.showInputDialog("Ingrese el nombre:");
                             idUsuario = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el Id del cliente:"));
                             ticketNum = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el id del ticket:"));
-                            fechaTranscurrida = LocalDateTime.now().withNano(0);
-                            ticketDao.borrarStatus(fechaTranscurrida, nombre, idUsuario, ticketNum);
+                            fechaActual = LocalDateTime.now().withNano(0);
+                            ticketDao.borrarStatus(fechaActual, nombre, idUsuario, ticketNum);
                             break;                                                                                                  
                         /*case 5: //borrar completamente (físicamente)
                             nombre = JOptionPane.showInputDialog("Ingrese el nombre:");
@@ -185,8 +201,10 @@ public class Parqueadero{
                             break;
                 }                                        
             }catch(Exception e){
-                System.out.println("Se ha generado un error: " + e.getMessage() + " Por favor verificar");  
-                JOptionPane.showMessageDialog(null, "Por favor sigua los paso correctamente", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                System.out.println("Se ha generado un error: " + e.getMessage() + " Por favor verificar"); 
+                if (e.getMessage().contains("For input string")) {
+                    JOptionPane.showMessageDialog(null, "Porfavor ingresar correctamente los datos solicitados", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }    
         }while(opcion != 0);
     }

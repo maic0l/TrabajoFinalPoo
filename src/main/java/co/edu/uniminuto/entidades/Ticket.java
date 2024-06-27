@@ -98,21 +98,28 @@ public class Ticket {
     
     // Método para generar una variable de tiempo basada en la fecha y hora de entrada
     public LocalDateTime generarVariableDeTiempo(LocalDateTime entradaDeVehiculo){
-        int dias = Integer.parseInt(JOptionPane.showInputDialog("Cuantos días: "));
         int horas;
+        int dias;
         int minutos = entradaDeVehiculo.getMinute();
+        
+        do{
+           dias = Integer.parseInt(JOptionPane.showInputDialog("Cuantos días (0-7): ")); 
+        }while(dias < 0 || dias > 7);     
+        
         do {
             horas = Integer.parseInt(JOptionPane.showInputDialog("Que hora del día (Formato 24h): "));            
         } while (horas < 0 || horas > 23 || dias == 0 && horas < entradaDeVehiculo.getHour());
-        if (minutos >= 0 && minutos < 15){
-            minutos = 15;
-        }else if (minutos >= 15 && minutos < 30){
-            minutos = 30;
-        }else if (minutos >= 30 && minutos < 45){
-            minutos = 45;
-        }else if (minutos >= 45 && minutos <= 60){
-            minutos = 59;
-        }
+        if (dias == 0){
+                if (minutos >= 0 && minutos < 15){
+                minutos = 15;
+            }else if (minutos >= 15 && minutos < 30){
+                minutos = 30;
+            }else if (minutos >= 30 && minutos < 45){
+                minutos = 45;
+            }else if (minutos >= 45 && minutos <= 60){
+                minutos = 59;
+            }
+        }        
         return entradaDeVehiculo.plusDays(dias).withHour(horas).withMinute(minutos).withSecond(entradaDeVehiculo.getSecond());
     }
  
